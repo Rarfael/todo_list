@@ -18,7 +18,7 @@ async function main() {
     abi: JSON.parse(todo.interface.format('json')),
   };
 
-  fs.writeFileSync('client/src/TodoList.json', JSON.stringify(data));
+  fs.writeFileSync('src/smart_contract/TodoList.json', JSON.stringify(data));
 }
 
 main()

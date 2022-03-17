@@ -14,18 +14,26 @@ contract TodoList {
         bool status;
         uint256 priority;
         bool trashed;
+        uint256 timestamp;
     }
 
     event TaskCreated(
         uint256 id,
         string title,
         string description,
-        bool status
+        bool status,
+        uint256 timestamp
     );
 
     event TaskToggled(uint256 id, bool status);
 
-    constructor() {}
+    constructor(
+        string memory title,
+        string memory description,
+        uint256 priority
+    ) {
+        createTask(title, description, priority);
+    }
 
     function createTask(
         string memory title,
@@ -33,6 +41,7 @@ contract TodoList {
         uint256 priority
     ) public {
         uint256 tasksInWallet = walletTasksCounter[msg.sender]++;
+        uint256 timestamp = block.timestamp;
         tasks[msg.sender][tasksInWallet] = Task(
             tasksInWallet,
             title,
@@ -40,9 +49,10 @@ contract TodoList {
             msg.sender,
             false,
             priority,
-            false
+            false,
+            timestamp
         );
-        emit TaskCreated(tasksInWallet, title, description, false);
+        emit TaskCreated(tasksInWallet, title, description, false, timestamp);
     }
 
     function toggleTask(uint256 id) public {

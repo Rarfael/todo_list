@@ -63,7 +63,7 @@ contract TodoList {
     }
 
     function deleteTask(uint256 id) public {
-        require(tasks[msg.sender][id].id == id);
+        require(tasks[msg.sender][id].id == id, 'TODO does not exist');
         Task memory task = tasks[msg.sender][id];
         task.trashed = true;
         tasks[msg.sender][id] = task;

@@ -50,25 +50,52 @@ describe("TodoList", function () {
     it("Should set todo as complete", async () => {
       await todo.connect(firstWallet).createTask("My Task", "Content", 10);
       const task = await todo.tasks(firstWallet.address, 0);
-
+      expect(task.status).to.equal(false);
       await todo.connect(firstWallet).toggleTask(task.id);
 
       const taskCompleted = await todo.tasks(firstWallet.address, task.id);
-        
+
       expect(taskCompleted.status).to.equal(true);
     });
 
     it("Should set todo as not completed", async () => {
-        await todo.connect(firstWallet).createTask("My Task", "Content", 10);
-        const task = await todo.tasks(firstWallet.address, 0);
-  
-        await todo.connect(firstWallet).toggleTask(task.id);
-        const taskCompleted = await todo.tasks(firstWallet.address, task.id);
-        expect(taskCompleted.status).to.equal(true);
+      await todo.connect(firstWallet).createTask("My Task", "Content", 10);
+      const task = await todo.tasks(firstWallet.address, 0);
 
-        await todo.connect(firstWallet).toggleTask(task.id);
-        const taskNotCompleted = await todo.tasks(firstWallet.address, task.id);
-        expect(taskNotCompleted.status).to.equal(false);
-      });
+      await todo.connect(firstWallet).toggleTask(task.id);
+      const taskCompleted = await todo.tasks(firstWallet.address, task.id);
+      expect(taskCompleted.status).to.equal(true);
+
+      await todo.connect(firstWallet).toggleTask(task.id);
+      const taskNotCompleted = await todo.tasks(firstWallet.address, task.id);
+      expect(taskNotCompleted.status).to.equal(false);
+    });
+  });
+
+  describe("Delete TODO", () => {
+    it("Should set todo trashed status as true", async () => {
+      await todo.connect(firstWallet).createTask("My Task", "Content", 10);
+      const task = await todo.tasks(firstWallet.address, 0);
+      expect(task.trashed).to.equal(false);
+
+      await todo.connect(firstWallet).deleteTask(task.id);
+
+      const taskDeleted = await todo.tasks(firstWallet.address, task.id);
+
+      expect(taskDeleted.trashed).to.equal(true);
+    });
+
+    it("Should fail if try to delete a inexistent task", async () => {
+      await todo.connect(firstWallet).createTask("My Task", "Content", 10);
+      const task = await todo.tasks(firstWallet.address, 0);
+      expect(task.trashed).to.equal(false);
+
+      await expect(
+        todo.connect(firstWallet).deleteTask(20)
+      ).to.be.revertedWith("TODO does not exist");
+      
+      const taskDeleted = await todo.tasks(firstWallet.address, task.id);
+      expect(taskDeleted.trashed).to.equal(false);
+    });
   });
 });
